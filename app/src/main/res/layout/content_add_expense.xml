@@ -57,12 +57,15 @@
         app:layout_constraintStart_toStartOf="@id/guideline_expense_setting"
         android:text="@string/date_label" />
 
-    <DatePicker
-        android:id="@+id/picker_date"
+    <Button
+        android:id="@+id/button_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/pick_date"
+        android:onClick="showDatePicker"
+        android:background="@android:color/transparent"
         app:layout_constraintStart_toEndOf="@id/tv_date_label"
         app:layout_constraintTop_toTopOf="@id/tv_date_label"
         app:layout_constraintBottom_toBottomOf="@id/tv_date_label">
-    </DatePicker>
+    </Button>
 </android.support.constraint.ConstraintLayout>
