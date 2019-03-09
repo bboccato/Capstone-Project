@@ -8,4 +8,61 @@
     tools:context=".AddExpense"
     tools:showIn="@layout/activity_add_expense">
 
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_expense_setting"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <TextView
+        android:id="@+id/tv_summary_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_expense_setting"
+        android:text="@string/summary_label" />
+
+    <EditText
+        android:id="@+id/et_summary_value"
+        android:layout_width="259dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/tv_summary_label"
+        app:layout_constraintTop_toTopOf="@id/tv_summary_label"
+        app:layout_constraintBottom_toBottomOf="@id/tv_summary_label"/>
+
+    <TextView
+        android:id="@+id/tv_total_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_summary_label"
+        app:layout_constraintStart_toStartOf="@id/guideline_expense_setting"
+        android:text="@string/total_label" />
+
+    <EditText
+        android:id="@+id/et_total_value"
+        android:layout_width="259dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/tv_total_label"
+        app:layout_constraintTop_toTopOf="@id/tv_total_label"
+        app:layout_constraintBottom_toBottomOf="@id/tv_total_label"/>
+
+
+    <TextView
+        android:id="@+id/tv_date_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_total_label"
+        app:layout_constraintStart_toStartOf="@id/guideline_expense_setting"
+        android:text="@string/date_label" />
+
+    <DatePicker
+        android:id="@+id/picker_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/tv_date_label"
+        app:layout_constraintTop_toTopOf="@id/tv_date_label"
+        app:layout_constraintBottom_toBottomOf="@id/tv_date_label">
+    </DatePicker>
 </android.support.constraint.ConstraintLayout>

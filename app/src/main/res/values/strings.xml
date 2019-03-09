@@ -16,4 +16,7 @@
     </string-array>
     <string name="title_activity_expenses_details">ExpensesDetails</string>
     <string name="title_activity_add_expense">AddExpense</string>
+    <string name="summary_label">Summary</string>
+    <string name="date_label">Date</string>
+    <string name="total_label">Total</string>
 </resources>
