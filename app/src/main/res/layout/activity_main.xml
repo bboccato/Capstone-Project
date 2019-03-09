@@ -25,11 +25,21 @@
         app:layout_constraintGuide_percent="0.75" />
 
     <ImageView
-        android:id="@+id/iv_pie_chart"
+        android:id="@+id/iv_pie_chart_expense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        ads:srcCompat="@android:drawable/radiobutton_on_background"
+        ads:srcCompat="@android:drawable/ic_input_add"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/iv_pie_chart_budget"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_pie_chart_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:srcCompat="@android:drawable/ic_menu_manage"
+        app:layout_constraintTop_toBottomOf="@id/iv_pie_chart_expense"
         app:layout_constraintBottom_toTopOf="@id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

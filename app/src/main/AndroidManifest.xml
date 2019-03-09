@@ -10,6 +10,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".AddExpense"
+            android:label="@string/title_activity_add_expense"
+            android:parentActivityName=".ExpensesDetails"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nanodegree.bianca.capstone.ExpensesDetails" />
+        </activity>
+        <activity
+            android:name=".ExpensesDetails"
+            android:label="@string/title_activity_expenses_details"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nanodegree.bianca.capstone.MainActivity" />
+        </activity>
+        <activity
             android:name=".BudgetSetting"
             android:label="@string/title_activity_budget_setting"
             android:parentActivityName=".MainActivity"

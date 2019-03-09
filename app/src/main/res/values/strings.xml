@@ -14,4 +14,6 @@
         <item>25</item>
         <item>30</item>
     </string-array>
+    <string name="title_activity_expenses_details">ExpensesDetails</string>
+    <string name="title_activity_add_expense">AddExpense</string>
 </resources>
