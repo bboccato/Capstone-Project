@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">BillSMS</string>
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="title_activity_budget_setting">BudgetSetting</string>
+    <string name="budget_label">Budget</string>
+    <string name="expire_label">Expire date</string>
+    <string name="notification_label">Notification</string>
+    <string-array name="day_of_month">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+    </string-array>
 </resources>
