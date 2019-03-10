@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
-    private Expense[] mDataSet;
+    private List<Expense> mDataSet;
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder {
         public TextView summary;
@@ -22,7 +24,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
         }
     }
 
-    public ExpenseAdapter(Expense[] dataSet) {
+    public ExpenseAdapter(List<Expense> dataSet) {
         mDataSet = dataSet;
     }
 
@@ -39,13 +41,13 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
     @Override
     public void onBindViewHolder(@NonNull ExpenseAdapter.ExpenseViewHolder expenseViewHolder,
                                  int position) {
-        expenseViewHolder.summary.setText(mDataSet[position].getExpenseSummary());
-        expenseViewHolder.value.setText(String.valueOf(mDataSet[position].getExpenseValue()));
-        expenseViewHolder.date.setText(mDataSet[position].getExpenseDate().toString());
+        expenseViewHolder.summary.setText(mDataSet.get(position).getExpenseSummary());
+        expenseViewHolder.value.setText(String.valueOf(mDataSet.get(position).getExpenseValue()));
+        expenseViewHolder.date.setText(mDataSet.get(position).getExpenseDate().toString());
     }
 
     @Override
     public int getItemCount() {
-        return mDataSet.length;
+        return mDataSet.size();
     }
 }
