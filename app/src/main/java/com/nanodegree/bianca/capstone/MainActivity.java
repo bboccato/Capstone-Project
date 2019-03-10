@@ -29,22 +29,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageView budgetStatus = findViewById(R.id.iv_pie_chart_budget);
-        budgetStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startBudgetSettingActivity();
-            }
-        });
-
-        ImageView expenseStatus = findViewById(R.id.iv_pie_chart_expense);
-        expenseStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startExpenseDetailsActivity();
-            }
-        });
-
         setupPieChart();
         setupAdBanner();
 
@@ -52,12 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
     /* SETUP */
     private void setupPieChart() {
+        // https://github.com/razerdp/AnimatedPieView/blob/master/README_EN.md
         mAnimatedPieView = findViewById(R.id.animatedPieView);
         AnimatedPieViewConfig config = new AnimatedPieViewConfig();
         config.startAngle(-90)
+//                .pieRadius(300f)
                 .strokeWidth(100)
                 .drawText(true)
-                .textSize(40)
+                .textSize(20)
                 .selectListener(new OnPieSelectListener() {
                     @Override
                     public void onSelectPie(@NonNull IPieInfo pieInfo, boolean isFloatUp) {
