@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
-    private List<Expense> mDataSet;
+    private List<ExpenseLocal> mDataSet;
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder {
         public TextView summary;
@@ -24,7 +24,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
         }
     }
 
-    public ExpenseAdapter(List<Expense> dataSet) {
+    public ExpenseAdapter(List<ExpenseLocal> dataSet) {
         mDataSet = dataSet;
     }
 

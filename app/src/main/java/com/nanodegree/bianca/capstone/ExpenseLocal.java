@@ -2,24 +2,23 @@ package com.nanodegree.bianca.capstone;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Expense {
+public class ExpenseLocal {
     private String expenseSummary;
     private float expenseValue;
     private Date expenseDate;
 
-    public Expense(String expenseSummary, float expenseValue, Date expenseDate) {
+    public ExpenseLocal(String expenseSummary, float expenseValue, Date expenseDate) {
         this.expenseSummary = expenseSummary;
         this.expenseValue = expenseValue;
         this.expenseDate = expenseDate;
     }
 
-    public Expense(String message) {
+    public ExpenseLocal(String message) {
         String regex =
                 ".*ompra.*\\*(.*) valor RS (\\d+\\.\\d\\d).*(\\d\\d/\\d\\d).*(\\d\\d:\\d\\d).*";
         Pattern pattern = Pattern.compile(regex);
