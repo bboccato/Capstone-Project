@@ -1,7 +1,6 @@
 package com.nanodegree.bianca.capstone;
 
 import android.Manifest;
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -21,6 +20,7 @@ import android.view.View;
 import com.nanodegree.bianca.capstone.data.AppDatabase;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ExpensesDetails extends AppCompatActivity {
@@ -65,6 +65,7 @@ public class ExpensesDetails extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+        // Room https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#11
         RecyclerView recyclerView = findViewById(R.id.rv_expenses_room_list);
         final ExpenseRoomAdapter adapter = new ExpenseRoomAdapter(this);
         recyclerView.setAdapter(adapter);
