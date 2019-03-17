@@ -42,13 +42,14 @@ public class MainActivity extends AppCompatActivity
 
     public static final String EXPENSES = "Expenses";
     public static final String REMAINING = "Remaining";
+    public static final float DEFAULT_BUDGET = 1000f;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
 
     private PublisherAdView mPublisherAdView;
     private AnimatedPieView mAnimatedPieView;
     private TextView mDaysLeftView;
-    private float mTotalExpenses;
-    private float mTotalBudget;
+    private float mTotalExpenses ;
+    private float mTotalBudget = DEFAULT_BUDGET;
     private static volatile ExpenseRoomDatabase INSTANCE;
     private ExpenseRoomDatabase mDb;
     private Expense mLatestExpense;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         config.startAngle(-90)
                 .strokeWidth(100)
                 .drawText(true)
-                .textSize(20)
+                .textSize(40)
                 .selectListener(new OnPieSelectListener() {
                     @Override
                     public void onSelectPie(@NonNull IPieInfo pieInfo, boolean isFloatUp) {
@@ -104,8 +105,10 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 })
-                .addData(new SimplePieInfo(getTotalExpenses(), Color.RED, EXPENSES), false)
-                .addData(new SimplePieInfo(getRemainingBudget(), Color.GREEN, REMAINING), false)
+                .addData(new SimplePieInfo(getTotalExpenses(), Color.RED,
+                        String.valueOf(getTotalExpenses())), false)
+                .addData(new SimplePieInfo(getRemainingBudget(), Color.GREEN,
+                        String.valueOf(getRemainingBudget())), false)
                 .duration(750);
         mAnimatedPieView.applyConfig(config);
         mAnimatedPieView.start();
