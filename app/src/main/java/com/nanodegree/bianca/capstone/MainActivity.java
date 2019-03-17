@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity
     private PublisherAdView mPublisherAdView;
     private AnimatedPieView mAnimatedPieView;
     private TextView mDaysLeftView;
+    private TextView mRemainingLegendView;
+    private TextView mExpensesLegendView;
     private float mTotalExpenses ;
     private float mTotalBudget = DEFAULT_BUDGET;
     private static volatile ExpenseRoomDatabase INSTANCE;
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDaysLeftView = findViewById(R.id.tv_days_left);
+        mRemainingLegendView = findViewById(R.id.tv_legend_remaining);
+        mExpensesLegendView = findViewById(R.id.tv_legend_expenses);
         setupSharedPreferences();
 
         mDb = ExpenseRoomDatabase.getDatabase(this);
@@ -89,10 +93,11 @@ public class MainActivity extends AppCompatActivity
         config.startAngle(-90)
                 .strokeWidth(100)
                 .drawText(true)
-                .textSize(40)
+                .textSize(30)
                 .selectListener(new OnPieSelectListener() {
                     @Override
                     public void onSelectPie(@NonNull IPieInfo pieInfo, boolean isFloatUp) {
+                        Log.d(TAG, "bib onSelectPie: ");
                         switch (pieInfo.getDesc()) {
                             case EXPENSES:
                                 startExpenseDetailsActivity();
@@ -105,10 +110,9 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 })
-                .addData(new SimplePieInfo(getTotalExpenses(), Color.RED,
-                        String.valueOf(getTotalExpenses())), false)
-                .addData(new SimplePieInfo(getRemainingBudget(), Color.GREEN,
-                        String.valueOf(getRemainingBudget())), false)
+                .addData(new SimplePieInfo(getTotalExpenses(), Color.RED, EXPENSES), false)
+                .addData(new SimplePieInfo(getRemainingBudget(), getResources().getColor(R.color.colorPrimary),
+                        REMAINING), false)
                 .duration(750);
         mAnimatedPieView.applyConfig(config);
         mAnimatedPieView.start();
@@ -236,6 +240,8 @@ public class MainActivity extends AppCompatActivity
         mLastExpireDate = lastExpireDayCalendar.getTimeInMillis();
         mDaysLeftView.setText(TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
                         todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS) + " days left");
+        mExpensesLegendView.setText(Util.formatSummary(EXPENSES, getTotalExpenses()));
+        mRemainingLegendView.setText(Util.formatSummary(REMAINING, getRemainingBudget()));
     }
 
     private void startBudgetSettingActivity() {
