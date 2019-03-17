@@ -1,23 +1,21 @@
 package com.nanodegree.bianca.capstone;
 
-import android.Manifest;
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.nanodegree.bianca.capstone.data.AppDatabase;
+import com.nanodegree.bianca.capstone.data.Expense;
+import com.nanodegree.bianca.capstone.data.ExpenseDao;
+import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,10 +27,9 @@ public class ExpensesDetails extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    private List<ExpenseLocal> myDataset = new ArrayList<>();
-//            {new ExpenseLocal("mercado", 10f, new Date()),
-//            new ExpenseLocal("luz", 12f, new Date()),
-//            new ExpenseLocal("telefone", 15f, new Date())};
+//    private List<ExpenseLocal> myDataset;
+
+    private List<Expense> mExpenses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +37,19 @@ public class ExpensesDetails extends AppCompatActivity {
         setContentView(R.layout.activity_expenses_details);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Intent intent = getIntent();
+        long expire = intent.getLongExtra("exp", 0);
 
+//        myDataset = new ArrayList<>();
+//        myDataset.add(new ExpenseLocal("mercado", 10f, new Date()));
+//        myDataset.add(new ExpenseLocal("luz", 12f, new Date()));
+//        myDataset.add(new ExpenseLocal("telefone", 15f, new Date()));
         recyclerView = findViewById(R.id.rv_expenses_list);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new ExpenseAdapter(myDataset);
-        recyclerView.setAdapter(mAdapter);
+
+        ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(this);
+        new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
+
 
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "bill-sms-db").build();
@@ -62,11 +65,40 @@ public class ExpensesDetails extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        // Room https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#11
-        RecyclerView recyclerView = findViewById(R.id.rv_expenses_room_list);
-        final ExpenseRoomAdapter adapter = new ExpenseRoomAdapter(this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+    }
+
+    public void setExpenses(List<Expense> expenses) {
+        mExpenses = expenses;
+    }
+
+    private class CurrentExpensesAsyncTask extends AsyncTask<Void, Void, List<Expense>> {
+
+        private Context mContext;
+        private ExpenseDao mAsyncTaskDao;
+        private long mLastExpireDate;
+
+        CurrentExpensesAsyncTask(Context context, ExpenseDao dao, long lastExpireDate) {
+            mContext = context;
+            mAsyncTaskDao = dao;
+            mLastExpireDate = lastExpireDate;
+        }
+
+        @Override
+        protected List<Expense> doInBackground(Void... voids) {
+//            List<Expense> expenses = (List<Expense>) mAsyncTaskDao.getAllB();
+            List<Expense> expenses =
+                    (List<Expense>) mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
+
+            return expenses;
+        }
+
+        @Override
+        protected void onPostExecute(List<Expense> expenses) {
+            setExpenses(expenses);
+            mAdapter = new ExpenseAdapter(mExpenses);
+            recyclerView.setAdapter(mAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        }
     }
 }

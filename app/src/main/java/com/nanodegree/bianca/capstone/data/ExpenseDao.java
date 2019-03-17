@@ -13,6 +13,10 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expense_table ORDER BY value ASC")
     LiveData<List<Expense>> getAll();
 
+
+    @Query("SELECT * FROM expense_table ORDER BY value ASC")
+    List<Expense> getAllB();
+
     @Query("SELECT * FROM expense_table WHERE uid IN (:expenseIds)")
     List<Expense> loadAllByIds(int[] expenseIds);
 
@@ -22,6 +26,9 @@ public interface ExpenseDao {
 
     @Query("SELECT * FROM expense_table ORDER BY date DESC LIMIT 1")
     Expense getLatest();
+
+    @Query("SELECT * FROM expense_table WHERE date > :lastExpireDate ORDER BY date")
+    List<Expense> getSinceLastExpire(long lastExpireDate);
 
     @Insert
     void insertAll(Expense... expenses);

@@ -7,10 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.nanodegree.bianca.capstone.data.Expense;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
-    private List<ExpenseLocal> mDataSet;
+    private List<Expense> mDataSet;
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder {
         public TextView summary;
@@ -24,7 +29,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
         }
     }
 
-    public ExpenseAdapter(List<ExpenseLocal> dataSet) {
+    public ExpenseAdapter(List<Expense> dataSet) {
         mDataSet = dataSet;
     }
 
@@ -41,9 +46,15 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
     @Override
     public void onBindViewHolder(@NonNull ExpenseAdapter.ExpenseViewHolder expenseViewHolder,
                                  int position) {
-        expenseViewHolder.summary.setText(mDataSet.get(position).getExpenseSummary());
-        expenseViewHolder.value.setText(String.valueOf(mDataSet.get(position).getExpenseValue()));
-        expenseViewHolder.date.setText(mDataSet.get(position).getExpenseDate().toString());
+        Expense expense = mDataSet.get(position);
+
+        expenseViewHolder.summary.setText(expense.summary);
+
+        expenseViewHolder.value.setText(String.format("US$ %.2f", expense.value));
+
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        String dateString = format.format(expense.date);
+        expenseViewHolder.date.setText(dateString);
     }
 
     @Override

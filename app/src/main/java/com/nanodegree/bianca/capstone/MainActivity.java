@@ -3,6 +3,7 @@ package com.nanodegree.bianca.capstone;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -14,24 +15,29 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
-import com.nanodegree.bianca.capstone.data.ExpenseViewModel;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
 import com.razerdp.widget.animatedpieview.AnimatedPieViewConfig;
 import com.razerdp.widget.animatedpieview.callback.OnPieSelectListener;
 import com.razerdp.widget.animatedpieview.data.IPieInfo;
 import com.razerdp.widget.animatedpieview.data.SimplePieInfo;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity {
+import static java.util.concurrent.TimeUnit.DAYS;
+
+public class MainActivity extends AppCompatActivity
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "MainActivity";
 
     public static final String EXPENSES = "Expenses";
@@ -40,35 +46,46 @@ public class MainActivity extends AppCompatActivity {
 
     private PublisherAdView mPublisherAdView;
     private AnimatedPieView mAnimatedPieView;
+    private TextView mDaysLeftView;
     private float mTotalExpenses;
+    private float mTotalBudget;
     private static volatile ExpenseRoomDatabase INSTANCE;
-    private List<ExpenseLocal> myDataset = new ArrayList<>();
-    private ExpenseViewModel mExpenseViewModel;
-    ExpenseRoomDatabase mDb;
+    private ExpenseRoomDatabase mDb;
     private Expense mLatestExpense;
+    private long mLastExpireDate;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDaysLeftView = findViewById(R.id.tv_days_left);
+        setupSharedPreferences();
+
         mDb = ExpenseRoomDatabase.getDatabase(this);
         ExpenseDao dao = mDb.expenseDao();
         new FetchLatestAsyncTask(this, dao).execute();
+        new TotalExpensesAsyncTask(dao, mLastExpireDate).execute();
 
-        //TODO and populate with latest expenses
-        setTotalExpenses(200f);
-        setupPieChart();
         setupAdBanner();
     }
 
     /* SETUP */
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setTotalBudget(Float.valueOf(sharedPreferences.getString(getString(R.string.key_budget),
+                "1000")));
+        setRemainingDays(sharedPreferences);
+        // Register the listener
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+    }
+
     private void setupPieChart() {
         // https://github.com/razerdp/AnimatedPieView/blob/master/README_EN.md
         mAnimatedPieView = findViewById(R.id.animatedPieView);
         AnimatedPieViewConfig config = new AnimatedPieViewConfig();
         config.startAngle(-90)
-//                .pieRadius(300f)
                 .strokeWidth(100)
                 .drawText(true)
                 .textSize(20)
@@ -161,12 +178,14 @@ public class MainActivity extends AppCompatActivity {
             String body = cursor.getString(bodyColumnIndex);
             long date = cursor.getLong(dateColumnIndex);
 
-            //TODO add expense to DB
-            new insertAsyncTask(mDb.expenseDao()).execute(ExpenseLocal.parseExpense(body, date));
+            new InsertExpenseAsyncTask(mDb.expenseDao()).execute(ExpenseLocal.parseExpense(body,
+                    date));
         }
         Log.d(TAG, "bib fetchSmsLog: > > > > count = " + cursor.getColumnCount());
 
     }
+
+
 
     /* AUX */
     public void setLatestExpense(Expense latestExpense) {
@@ -178,16 +197,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setTotalExpenses(float totalExpenses) {
+        Log.d(TAG, "bib setTotalExpenses: " + totalExpenses);
         mTotalExpenses = totalExpenses;
     }
 
     private float getTotalBudget() {
-        //TODO replace with appropriate value from preferences
-        return 400f;
+        return mTotalBudget;
+    }
+
+    public void setTotalBudget(float totalBudget) {
+        Log.d(TAG, "bib setTotalBudget: " + totalBudget);
+        mTotalBudget = totalBudget;
+        //TODO is it possible to just update the chart rather than recreating it?
+        setupPieChart();
     }
 
     private float getRemainingBudget() {
         return getTotalBudget() - getTotalExpenses();
+    }
+
+    private void setRemainingDays(SharedPreferences sharedPreferences) {
+        Calendar todayCalendar = Calendar.getInstance();
+        Calendar nextExpireDayCalendar = Calendar.getInstance();
+        Calendar lastExpireDayCalendar = Calendar.getInstance();
+        int today = todayCalendar.get(Calendar.DATE);
+        int expireDay = Integer.valueOf(sharedPreferences.getString(getString(R.string.key_expire),
+                "1"));
+        if (expireDay < today) {
+            nextExpireDayCalendar.add(Calendar.MONTH, 1);
+        } else {
+            lastExpireDayCalendar.add(Calendar.MONTH, -1);
+        }
+        nextExpireDayCalendar.set(Calendar.DATE, expireDay);
+        lastExpireDayCalendar.set(Calendar.DATE, expireDay);
+        mLastExpireDate = lastExpireDayCalendar.getTimeInMillis();
+        mDaysLeftView.setText(TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
+                        todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS) + " days left");
     }
 
     private void startBudgetSettingActivity() {
@@ -197,7 +242,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void startExpenseDetailsActivity() {
         Intent intent = new Intent(getApplicationContext(), ExpensesDetails.class);
+        intent.putExtra("exp", mLastExpireDate);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.key_budget))) {
+            setTotalBudget(Float.valueOf(sharedPreferences.getString(key, "1000")));
+        }
+        if (key.equals(getString(R.string.key_expire))) {
+            setRemainingDays(sharedPreferences);
+        }
     }
 
     private class FetchLatestAsyncTask extends AsyncTask<Expense, Void, Expense> {
@@ -223,28 +279,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class UpdateDbAsyncTask extends AsyncTask<List<Expense>, Void, Void> {
-
-        private ExpenseDao mAsyncTaskDao;
-        private List<Expense> mExpenses;
-
-        UpdateDbAsyncTask(ExpenseDao dao, List<Expense> expenses) {
-            mAsyncTaskDao = dao;
-            mExpenses = expenses;
-        }
-
-        @Override
-        protected Void doInBackground(final List<Expense>... params) {
-            mAsyncTaskDao.insert(mExpenses.get(0));
-            return null;
-        }
-    }
-
-    private class insertAsyncTask extends AsyncTask<Expense, Void, Void> {
+    private class InsertExpenseAsyncTask extends AsyncTask<Expense, Void, Void> {
 
         private ExpenseDao mAsyncTaskDao;
 
-        insertAsyncTask(ExpenseDao dao) {
+        InsertExpenseAsyncTask(ExpenseDao dao) {
             mAsyncTaskDao = dao;
         }
 
@@ -255,6 +294,35 @@ public class MainActivity extends AppCompatActivity {
                 mAsyncTaskDao.insert(params[0]);
             }
             return null;
+        }
+    }
+
+    private class TotalExpensesAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private ExpenseDao mAsyncTaskDao;
+        private long mLastExpireDate;
+
+        TotalExpensesAsyncTask(ExpenseDao dao, long lastExpireDate) {
+            mAsyncTaskDao = dao;
+            mLastExpireDate = lastExpireDate;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+//            List<Expense> expenses = (List<Expense>) mAsyncTaskDao.getAllB();
+            List<Expense> expenses =
+                    (List<Expense>) mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
+            float total = 0f;
+            for (Expense e : expenses) {
+                total += e.value;
+            }
+            setTotalExpenses(total);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            setupPieChart();
         }
     }
 
