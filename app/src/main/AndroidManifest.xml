@@ -12,9 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BudgetPreferences"></activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".BudgetSettings"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -33,15 +32,6 @@
         <activity
             android:name=".ExpensesDetails"
             android:label="@string/title_activity_expenses_details"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nanodegree.bianca.capstone.MainActivity" />
-        </activity>
-        <activity
-            android:name=".BudgetSetting"
-            android:label="@string/title_activity_budget_setting"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

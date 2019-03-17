@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startBudgetSettingActivity() {
-        Intent intent = new Intent(getApplicationContext(), BudgetPreferences.class);
+        Intent intent = new Intent(getApplicationContext(), BudgetSettings.class);
         startActivity(intent);
     }
 
