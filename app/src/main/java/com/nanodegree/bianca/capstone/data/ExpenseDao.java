@@ -20,6 +20,9 @@ public interface ExpenseDao {
             "value LIKE :value LIMIT 1")
     Expense findBySummary(String summary, String value);
 
+    @Query("SELECT * FROM expense_table ORDER BY date DESC LIMIT 1")
+    Expense getLatest();
+
     @Insert
     void insertAll(Expense... expenses);
 

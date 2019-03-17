@@ -25,7 +25,6 @@ import java.util.List;
 
 public class ExpensesDetails extends AppCompatActivity {
     private static final String TAG = "bib ExpensesDetails";
-    private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -41,8 +40,6 @@ public class ExpensesDetails extends AppCompatActivity {
         setContentView(R.layout.activity_expenses_details);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        requestSmsReadPermission();
 
         recyclerView = findViewById(R.id.rv_expenses_list);
         recyclerView.setHasFixedSize(true);
@@ -70,59 +67,6 @@ public class ExpensesDetails extends AppCompatActivity {
         final ExpenseRoomAdapter adapter = new ExpenseRoomAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-    }
-
-    private void requestSmsReadPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "parseSmsLog: READ_SMS permission not granted");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_SMS},
-                    MY_PERMISSIONS_REQUEST_READ_SMS);
-        } else {
-            Log.d(TAG, "parseSmsLog: READ_SMS permission granted :)");
-            parseSmsLog();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_SMS: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    parseSmsLog();
-                } else {
-                    // TODO permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
-    }
-
-    private void parseSmsLog() {
-        // https://androidforums.com/threads/querying-the-sms-content-provider.158592/
-        // filter by number and date
-
-        Uri allMessages = Uri.parse("content://sms/inbox");
-        //Cursor cursor = managedQuery(allMessages, null, null, null, null); Both are same
-        Cursor cursor = this.getContentResolver().query(allMessages, null,
-                null, null, null);
-
-        int columnIndex = cursor.getColumnIndex("body");
-
-        while (cursor.moveToNext()) {
-            for (int i = 0; i < cursor.getColumnCount(); i++) {
-                Log.d(TAG +  "- " + cursor.getColumnName(i) + "", cursor.getString(i) + "");
-            }
-            Log.d(TAG + "One row finished",
-                    "**************************************************");
-            String body = cursor.getString(columnIndex);
-            myDataset.add(new ExpenseLocal(body));
-        }
 
     }
 }

@@ -1,5 +1,7 @@
 package com.nanodegree.bianca.capstone;
 
+import com.nanodegree.bianca.capstone.data.Expense;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,6 +39,22 @@ public class ExpenseLocal {
                 this.expenseDate = new Date();
             }
 
+        }
+    }
+
+    public static Expense parseExpense(String message, long indate) {
+        String regex =
+                ".*ompra.*\\*(.*) valor RS (\\d+\\.\\d\\d).*";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find()) {
+            String expenseSummary = matcher.group(1);
+            String value = matcher.group(2);
+            float expenseValue = Float.valueOf(value);
+
+            return new Expense(indate, expenseSummary, expenseValue);
+        } else {
+            return null;
         }
     }
 
