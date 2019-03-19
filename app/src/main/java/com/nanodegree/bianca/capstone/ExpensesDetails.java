@@ -30,7 +30,8 @@ public class ExpensesDetails extends AppCompatActivity {
 //    private List<ExpenseLocal> myDataset;
 
     private List<Expense> mExpenses;
-
+    private ExpenseRoomDatabase mDb;
+    private long expire;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,7 @@ public class ExpensesDetails extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
-        long expire = intent.getLongExtra("exp", 0);
+        expire = intent.getLongExtra("exp", 0);
 
 //        myDataset = new ArrayList<>();
 //        myDataset.add(new ExpenseLocal("mercado", 10f, new Date()));
@@ -47,7 +48,7 @@ public class ExpensesDetails extends AppCompatActivity {
         recyclerView = findViewById(R.id.rv_expenses_list);
         recyclerView.setHasFixedSize(true);
 
-        ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(this);
+        mDb = ExpenseRoomDatabase.getDatabase(this);
         new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
 
 
@@ -63,9 +64,12 @@ public class ExpensesDetails extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
     }
 
     public void setExpenses(List<Expense> expenses) {
