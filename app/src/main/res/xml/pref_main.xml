@@ -3,7 +3,9 @@
     <PreferenceCategory android:title="Budget">
         <EditTextPreference
             android:defaultValue="1000"
+            android:inputType="text"
             android:key="@string/key_budget"
+            android:singleLine="true"
             android:title="@string/budget_label" />
 
         <ListPreference
@@ -12,13 +14,11 @@
             android:entries="@array/pref_expire_date"
             android:entryValues="@array/pref_expire_date"
             android:key="@string/key_expire"
-            android:summary="@string/expire_label"
             android:title="@string/expire_label" />
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/key_notification"
-            android:summary="@string/notification_label"
             android:title="@string/notification_label" />
 
     </PreferenceCategory>

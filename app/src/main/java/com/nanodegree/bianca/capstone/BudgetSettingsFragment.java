@@ -4,13 +4,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.util.Log;
 
 public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
         SharedPreferences.OnSharedPreferenceChangeListener{
+    private static final String TAG = "BudgetSettingsFragment";
 
     private void setPreferenceSummary(Preference preference, Object value) {
         String stringValue = value.toString();
@@ -26,6 +29,14 @@ public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
+            if (preference instanceof EditTextPreference) { // Total budget
+                try {
+                    Float.valueOf(stringValue);
+                } catch (NumberFormatException nfe) {
+                    Log.d(TAG, "bib setPreferenceSummary: " + stringValue);
+                    stringValue = "1000.00";
+                }
+            }
             preference.setSummary(stringValue);
         }
     }
@@ -69,6 +80,8 @@ public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
             if (!(preference instanceof SwitchPreference)) {
                 String value = sharedPreferences.getString(preference.getKey(), "");
                 setPreferenceSummary(preference, sharedPreferences.getString(key, value));
+                sharedPreferences.edit().putString(key, value);
+                sharedPreferences.edit().commit();
             }
         }
     }

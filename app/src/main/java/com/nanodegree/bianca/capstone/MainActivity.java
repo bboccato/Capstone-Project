@@ -14,9 +14,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -48,8 +52,9 @@ public class MainActivity extends AppCompatActivity
     private TextView mDaysLeftView;
     private TextView mRemainingLegendView;
     private TextView mExpensesLegendView;
-    private float mTotalExpenses ;
-    private float mTotalBudget = DEFAULT_BUDGET;
+    private TextView mDebug;
+    private float mTotalExpenses;
+    private float mTotalBudget;
     private static volatile ExpenseRoomDatabase INSTANCE;
     private ExpenseRoomDatabase mDb;
     private ExpenseDao mDao;
@@ -57,7 +62,9 @@ public class MainActivity extends AppCompatActivity
     private long mLastExpireDate;
     private SharedPreferences mSharedPreferences;
 
-
+    public void debug() {
+        mDebug.setText("EXP [" + mTotalExpenses + "]\nBUD [" + mTotalBudget + "]\nDAT [");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
@@ -66,12 +73,20 @@ public class MainActivity extends AppCompatActivity
         mDaysLeftView = findViewById(R.id.tv_days_left);
         mRemainingLegendView = findViewById(R.id.tv_legend_remaining);
         mExpensesLegendView = findViewById(R.id.tv_legend_expenses);
+        mDebug = findViewById(R.id.debug);
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
         setupAdBanner();
         setupSharedPreferences();
+        setSupportActionBar(toolbar);
 
         mDb = ExpenseRoomDatabase.getDatabase(this);
         mDao = mDb.expenseDao();
 
+        mTotalBudget =
+                Float.valueOf(mSharedPreferences.getString(getResources().getString(R.string.key_budget),
+                String.valueOf(DEFAULT_BUDGET)));
+
+        debug();
     }
 
     @Override
@@ -80,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         new FetchLatestExpenseInDbAsyncTask(this, mDao).execute();
         new FetchTotalExpensesAsyncTask(mDao, mLastExpireDate).execute();
+        debug();
     }
 
     /* SHARED PREFERENCES */
@@ -94,14 +110,34 @@ public class MainActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "onSharedPreferenceChanged: ");
         if (key.equals(getString(R.string.key_budget))) {
-            setTotalBudget(Float.valueOf(sharedPreferences.getString(key,
-                    String.valueOf(DEFAULT_BUDGET))));
+            try {
+                setTotalBudget(Float.valueOf(sharedPreferences.getString(key,
+                        String.valueOf(DEFAULT_BUDGET))));
+            } catch (NumberFormatException nfe) {
+                sharedPreferences.edit().putString(key, String.valueOf(DEFAULT_BUDGET));
+                setTotalBudget(DEFAULT_BUDGET);
+            }
         }
         if (key.equals(getString(R.string.key_expire))) {
             updateLegends(sharedPreferences);
         }
         setupPieChart();
         updateLegends(mSharedPreferences);
+
+        debug();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        startBudgetSettingActivity();
+        return super.onOptionsItemSelected(item);
     }
 
     /* PIE CHART */
@@ -131,31 +167,13 @@ public class MainActivity extends AppCompatActivity
                     }
                 })
                 .addData(new SimplePieInfo(getTotalExpenses(), Color.RED, EXPENSES), false)
-                .addData(new SimplePieInfo(getRemainingBudget(), getResources().getColor(R.color.colorPrimary),
-                        REMAINING), false)
+                .addData(new SimplePieInfo(Math.max(getRemainingBudget(), 0f),
+                        getResources().getColor(R.color.colorPrimary), REMAINING), false)
                 .duration(750);
         mAnimatedPieView.applyConfig(config);
         mAnimatedPieView.start();
-    }
 
-    private void updateDaysLeft(SharedPreferences sharedPreferences) {
-        Log.d(TAG, "updateDaysLeft: ");
-        Calendar todayCalendar = Calendar.getInstance();
-        Calendar nextExpireDayCalendar = Calendar.getInstance();
-        Calendar lastExpireDayCalendar = Calendar.getInstance();
-        int today = todayCalendar.get(Calendar.DATE);
-        int expireDay = Integer.valueOf(sharedPreferences.getString(getString(R.string.key_expire),
-                "1"));
-        if (expireDay < today) {
-            nextExpireDayCalendar.add(Calendar.MONTH, 1);
-        } else {
-            lastExpireDayCalendar.add(Calendar.MONTH, -1);
-        }
-        nextExpireDayCalendar.set(Calendar.DATE, expireDay);
-        lastExpireDayCalendar.set(Calendar.DATE, expireDay);
-        mLastExpireDate = lastExpireDayCalendar.getTimeInMillis();
-        mDaysLeftView.setText(TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
-                todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS) + " days left");
+        debug();
     }
 
     private void updateLegends(SharedPreferences sharedPreferences) {
@@ -176,8 +194,14 @@ public class MainActivity extends AppCompatActivity
         mLastExpireDate = lastExpireDayCalendar.getTimeInMillis();
         mDaysLeftView.setText(TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
                 todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS) + " days left");
-        mExpensesLegendView.setText(Util.formatSummary(EXPENSES, getTotalExpenses()));
-        mRemainingLegendView.setText(Util.formatSummary(REMAINING, getRemainingBudget()));
+
+        mExpensesLegendView.setText(Util.formatSummary(
+                getResources().getString(R.string.expenses_label), getTotalExpenses()));
+        mRemainingLegendView.setText(Util.formatSummary(
+                getResources().getString(R.string.remaining_label),
+                Math.max(getRemainingBudget(), 0f)));
+
+        debug();
     }
 
 
@@ -259,14 +283,19 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, "bib fetchSmsLog: > > > > count = " + cursor.getColumnCount());
 
+        debug();
+
     }
 
     /* GETTERS / SETTERS */
     public void setLatestExpense(Expense latestExpense) {
         this.mLatestExpense = latestExpense;
+
+        debug();
     }
 
     public float getTotalExpenses() {
+        debug();
         return mTotalExpenses;
     }
 
@@ -275,6 +304,8 @@ public class MainActivity extends AppCompatActivity
         mTotalExpenses = totalExpenses;
         updateLegends(mSharedPreferences);
         setupPieChart();
+
+        debug();
     }
 
     private float getTotalBudget() {
@@ -287,6 +318,8 @@ public class MainActivity extends AppCompatActivity
         //TODO is it possible to just update the chart rather than recreating it?
         updateLegends(mSharedPreferences);
         setupPieChart();
+
+        debug();
     }
 
     private float getRemainingBudget() {
@@ -325,6 +358,8 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Expense expense) {
             setLatestExpense(expense);
             requestSmsReadPermission();
+
+            debug();
         }
     }
 
@@ -370,6 +405,8 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Float total) {
             setTotalExpenses(total);
             setupPieChart();
+
+            debug();
         }
     }
 
