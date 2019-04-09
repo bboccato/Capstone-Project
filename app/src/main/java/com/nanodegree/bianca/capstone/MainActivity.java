@@ -192,8 +192,11 @@ public class MainActivity extends AppCompatActivity
         nextExpireDayCalendar.set(Calendar.DATE, expireDay);
         lastExpireDayCalendar.set(Calendar.DATE, expireDay);
         mLastExpireDate = lastExpireDayCalendar.getTimeInMillis();
-        mDaysLeftView.setText(TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
-                todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS) + " days left");
+        long daysLeft = TimeUnit.DAYS.convert(nextExpireDayCalendar.getTimeInMillis() -
+                todayCalendar.getTimeInMillis(), TimeUnit.MILLISECONDS);
+        String label = getResources().getQuantityString(R.plurals.days_left_label, Math.toIntExact(daysLeft),
+                Math.toIntExact(daysLeft));
+        mDaysLeftView.setText(label);
 
         mExpensesLegendView.setText(Util.formatSummary(
                 getResources().getString(R.string.expenses_label), getTotalExpenses()));
@@ -283,6 +286,7 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, "bib fetchSmsLog: > > > > count = " + cursor.getColumnCount());
 
+        cursor.close();
         debug();
 
     }

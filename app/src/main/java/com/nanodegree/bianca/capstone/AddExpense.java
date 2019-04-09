@@ -1,27 +1,24 @@
 package com.nanodegree.bianca.capstone;
 
-import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
 
 import java.util.Date;
-import java.util.List;
 
 public class AddExpense extends AppCompatActivity {
 
-    private Button mButton;
+    private Button mSaveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +29,25 @@ public class AddExpense extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mButton = findViewById(R.id.button);
+        mSaveButton = findViewById(R.id.button);
         final EditText summary = findViewById(R.id.et_summary_value);
         final EditText value = findViewById(R.id.et_total_value);
         Date date;
 
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Expense expense = new Expense((new Date()).getTime(), summary.getText().toString(),
-                        Float.valueOf(value.getText().toString()));
-                ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(getApplicationContext());
-                ExpenseDao dao = mDb.expenseDao();
-                new AddExpenseAsyncTask(dao, expense).execute();
+                try {
+                    Expense expense = new Expense((new Date()).getTime(), summary.getText().toString(),
+                            Float.valueOf(value.getText().toString()));
+                    ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(getApplicationContext());
+                    ExpenseDao dao = mDb.expenseDao();
+                    new AddExpenseAsyncTask(dao, expense).execute();
+                } catch (NumberFormatException nfe) {
+                    Toast.makeText(getApplicationContext(), "NO GO", Toast.LENGTH_LONG).show();
+
+                }
             }
         });
     }
