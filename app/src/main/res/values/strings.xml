@@ -100,4 +100,7 @@
     <string name="expenses_label">Expenses</string>
     <string name="remaining_label">Remaining</string>
     <string name="days_left_label">day(s) left</string>
+    <string name="add_expense_error_save_btn">Please, add expense amount</string>
+    <string name="add_expense_error_pause">Expense not added - expense value was missing</string>
+    <string name="add_expense_success">Expense added</string>
 </resources>

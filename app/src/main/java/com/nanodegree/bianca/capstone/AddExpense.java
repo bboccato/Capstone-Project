@@ -19,6 +19,8 @@ import java.util.Date;
 public class AddExpense extends AppCompatActivity {
 
     private Button mSaveButton;
+    private EditText mSummary;
+    private EditText mValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +32,8 @@ public class AddExpense extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mSaveButton = findViewById(R.id.button);
-        final EditText summary = findViewById(R.id.et_summary_value);
-        final EditText value = findViewById(R.id.et_total_value);
+        mSummary = findViewById(R.id.et_summary_value);
+        mValue = findViewById(R.id.et_total_value);
         Date date;
 
 
@@ -39,14 +41,14 @@ public class AddExpense extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    Expense expense = new Expense((new Date()).getTime(), summary.getText().toString(),
-                            Float.valueOf(value.getText().toString()));
+                    Expense expense = new Expense((new Date()).getTime(), mSummary.getText().toString(),
+                            Float.valueOf(mValue.getText().toString()));
                     ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(getApplicationContext());
                     ExpenseDao dao = mDb.expenseDao();
                     new AddExpenseAsyncTask(dao, expense).execute();
                 } catch (NumberFormatException nfe) {
-                    Toast.makeText(getApplicationContext(), "NO GO", Toast.LENGTH_LONG).show();
-
+                    Toast.makeText(getApplicationContext(), R.string.add_expense_error_save_btn,
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -55,7 +57,16 @@ public class AddExpense extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //TODO persist data
+        try {
+            Expense expense = new Expense((new Date()).getTime(), mSummary.getText().toString(),
+                    Float.valueOf(mValue.getText().toString()));
+            ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(getApplicationContext());
+            ExpenseDao dao = mDb.expenseDao();
+            new AddExpenseAsyncTask(dao, expense).execute();
+        } catch (NumberFormatException nfe) {
+            Toast.makeText(getApplicationContext(), R.string.add_expense_error_pause,
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showDatePicker(View view) {
@@ -82,6 +93,9 @@ public class AddExpense extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             finish();
+            Toast.makeText(getApplicationContext(), R.string.add_expense_success,
+                    Toast.LENGTH_SHORT).show();
+
         }
     }
 }
