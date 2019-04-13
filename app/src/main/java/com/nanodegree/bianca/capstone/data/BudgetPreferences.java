@@ -11,7 +11,7 @@ public class BudgetPreferences {
     public static final String PREF_EXPIRE = "expire";
     public static final String PREF_NOTIFICATION = "notification";
 
-    private static final float DEFAULT_BUDGET = 1000f;
+    public static final float DEFAULT_BUDGET = 1000f;
     private static final int DEFAULT_EXPIRE = 10;
     private static final boolean DEFAULT_NOTIFICATION = true;
 

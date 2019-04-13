@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ExpensesDetails extends AppCompatActivity {
-    private static final String TAG = "bib ExpensesDetails";
+    private static final String TAG = "ExpensesDetails";
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;

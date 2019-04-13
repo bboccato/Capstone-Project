@@ -45,6 +45,7 @@ public class ExpenseLocal {
     public static Expense parseExpense(String message, long indate) {
         String regex =
                 ".*ompra.*\\*(.*) valor RS (\\d+\\.\\d\\d).*";
+//                ".*ompra.*\\*(.*) valor RS (\\d+).*";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(message);
         if (matcher.find()) {

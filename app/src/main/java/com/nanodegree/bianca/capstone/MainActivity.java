@@ -21,7 +21,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "bib, MainActivity";
+    private static final String TAG = "MainActivity";
 
     public static final String EXPENSES = "Expenses";
     public static final String REMAINING = "Remaining";
@@ -62,9 +64,6 @@ public class MainActivity extends AppCompatActivity
     private long mLastExpireDate;
     private SharedPreferences mSharedPreferences;
 
-    public void debug() {
-        mDebug.setText("EXP [" + mTotalExpenses + "]\nBUD [" + mTotalBudget + "]\nDAT [");
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
@@ -72,7 +71,19 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         mDaysLeftView = findViewById(R.id.tv_days_left);
         mRemainingLegendView = findViewById(R.id.tv_legend_remaining);
+        mRemainingLegendView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startBudgetSettingActivity();
+            }
+        });
         mExpensesLegendView = findViewById(R.id.tv_legend_expenses);
+        mExpensesLegendView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startExpenseDetailsActivity();
+            }
+        });
         mDebug = findViewById(R.id.debug);
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setupAdBanner();
@@ -85,8 +96,6 @@ public class MainActivity extends AppCompatActivity
         mTotalBudget =
                 Float.valueOf(mSharedPreferences.getString(getResources().getString(R.string.key_budget),
                 String.valueOf(DEFAULT_BUDGET)));
-
-        debug();
     }
 
     @Override
@@ -95,7 +104,6 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         new FetchLatestExpenseInDbAsyncTask(this, mDao).execute();
         new FetchTotalExpensesAsyncTask(mDao, mLastExpireDate).execute();
-        debug();
     }
 
     /* SHARED PREFERENCES */
@@ -123,8 +131,6 @@ public class MainActivity extends AppCompatActivity
         }
         setupPieChart();
         updateLegends(mSharedPreferences);
-
-        debug();
     }
 
     @Override
@@ -136,7 +142,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        startBudgetSettingActivity();
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startBudgetSettingActivity();
+                break;
+            case R.id.action_add_expense:
+                startAddExpenseActivity();
+                break;
+            default:
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -153,7 +168,7 @@ public class MainActivity extends AppCompatActivity
                 .selectListener(new OnPieSelectListener() {
                     @Override
                     public void onSelectPie(@NonNull IPieInfo pieInfo, boolean isFloatUp) {
-                        Log.d(TAG, "bib onSelectPie: ");
+                        Log.d(TAG, "onSelectPie: ");
                         switch (pieInfo.getDesc()) {
                             case EXPENSES:
                                 startExpenseDetailsActivity();
@@ -172,8 +187,6 @@ public class MainActivity extends AppCompatActivity
                 .duration(750);
         mAnimatedPieView.applyConfig(config);
         mAnimatedPieView.start();
-
-        debug();
     }
 
     private void updateLegends(SharedPreferences sharedPreferences) {
@@ -203,11 +216,7 @@ public class MainActivity extends AppCompatActivity
         mRemainingLegendView.setText(Util.formatSummary(
                 getResources().getString(R.string.remaining_label),
                 Math.max(getRemainingBudget(), 0f)));
-
-        debug();
     }
-
-
 
     /* ADD BANNER */
     private void setupAdBanner() {
@@ -228,7 +237,7 @@ public class MainActivity extends AppCompatActivity
                     MY_PERMISSIONS_REQUEST_READ_SMS);
         } else {
             Log.d(TAG, "requestSmsReadPermission: READ_SMS permission granted :)");
-            fetchSmsLog();
+            new InsertExpenseFromSmsAsyncTask().execute();
         }
     }
 
@@ -240,10 +249,10 @@ public class MainActivity extends AppCompatActivity
             case MY_PERMISSIONS_REQUEST_READ_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    fetchSmsLog();
+                    new InsertExpenseFromSmsAsyncTask().execute();
                 } else {
-                    // TODO permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // Permission denied, boo!
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT);
                 }
                 return;
             }
@@ -259,10 +268,11 @@ public class MainActivity extends AppCompatActivity
         String selection = Telephony.Sms.DATE + " > ?";
         String[] selectionArgs;
         if (mLatestExpense == null) {
-            //TODO fetch messages from latest month
+            Log.d(TAG, "fetchSmsLog: latest expense is null");
             selectionArgs = new String[] {"0"};
         } else {
             // fetch messages since latest
+            Log.d(TAG, "fetchSmsLog: latest expense is " + mLatestExpense.summary);
             selectionArgs = new String[] {Long.toString(mLatestExpense.date)};
         }
         Cursor cursor = this.getContentResolver().query(allMessages, null,
@@ -271,7 +281,6 @@ public class MainActivity extends AppCompatActivity
         int bodyColumnIndex = cursor.getColumnIndex("body");
         int dateColumnIndex = cursor.getColumnIndex("date");
 
-        Log.d(TAG, "bib fetchSmsLog: > > > >");
         while (cursor.moveToNext()) {
             for (int i = 0; i < cursor.getColumnCount(); i++) {
                 Log.d(TAG +  "- " + cursor.getColumnName(i) + "", cursor.getString(i) + "");
@@ -281,35 +290,27 @@ public class MainActivity extends AppCompatActivity
             String body = cursor.getString(bodyColumnIndex);
             long date = cursor.getLong(dateColumnIndex);
 
-            new InsertExpenseFromSmsAsyncTask(mDb.expenseDao()).execute(ExpenseLocal.parseExpense(body,
-                    date));
+            Expense l = ExpenseLocal.parseExpense(body, date);
+            if (l != null) mDb.expenseDao().insert(l);
         }
-        Log.d(TAG, "bib fetchSmsLog: > > > > count = " + cursor.getColumnCount());
 
         cursor.close();
-        debug();
-
     }
 
     /* GETTERS / SETTERS */
     public void setLatestExpense(Expense latestExpense) {
         this.mLatestExpense = latestExpense;
-
-        debug();
     }
 
     public float getTotalExpenses() {
-        debug();
         return mTotalExpenses;
     }
 
     public void setTotalExpenses(float totalExpenses) {
-        Log.d(TAG, "bib setTotalExpenses: " + totalExpenses);
+        Log.d(TAG, "setTotalExpenses: " + totalExpenses);
         mTotalExpenses = totalExpenses;
         updateLegends(mSharedPreferences);
         setupPieChart();
-
-        debug();
     }
 
     private float getTotalBudget() {
@@ -317,13 +318,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setTotalBudget(float totalBudget) {
-        Log.d(TAG, "bib setTotalBudget: " + totalBudget);
+        Log.d(TAG, "setTotalBudget: " + totalBudget);
         mTotalBudget = totalBudget;
-        //TODO is it possible to just update the chart rather than recreating it?
         updateLegends(mSharedPreferences);
         setupPieChart();
-
-        debug();
     }
 
     private float getRemainingBudget() {
@@ -338,6 +336,11 @@ public class MainActivity extends AppCompatActivity
     private void startExpenseDetailsActivity() {
         Intent intent = new Intent(getApplicationContext(), ExpensesDetails.class);
         intent.putExtra("exp", mLastExpireDate);
+        startActivity(intent);
+    }
+
+    private void startAddExpenseActivity() {
+        Intent intent = new Intent(getApplicationContext(), AddExpense.class);
         startActivity(intent);
     }
 
@@ -362,25 +365,15 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Expense expense) {
             setLatestExpense(expense);
             requestSmsReadPermission();
-
-            debug();
         }
     }
 
-    private class InsertExpenseFromSmsAsyncTask extends AsyncTask<Expense, Void, Void> {
-
-        private ExpenseDao mAsyncTaskDao;
-
-        InsertExpenseFromSmsAsyncTask(ExpenseDao dao) {
-            mAsyncTaskDao = dao;
-        }
+    private class InsertExpenseFromSmsAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Void doInBackground(final Expense... params) {
-            Log.d(TAG, "bib doInBackground: INSERT " + params[0].summary);
-            if (params[0] != null) {
-                mAsyncTaskDao.insert(params[0]);
-            }
+        protected Void doInBackground(Void... voids) {
+            Log.d(TAG, "InsertExpenseTask doInBackground: ");
+            fetchSmsLog();
             return null;
         }
     }
@@ -409,8 +402,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Float total) {
             setTotalExpenses(total);
             setupPieChart();
-
-            debug();
         }
     }
 

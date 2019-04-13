@@ -4,6 +4,11 @@
     <item
         android:id="@+id/action_settings"
         android:title="@string/menu_settings"
-        app:showAsAction="ifRoom">
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/action_add_expense"
+        android:title="@string/menu_add_expense"
+        app:showAsAction="never">
     </item>
 </menu>
