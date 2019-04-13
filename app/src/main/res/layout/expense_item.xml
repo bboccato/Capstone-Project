@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/shadedColorPrimary"
+    android:padding="@dimen/expense_padding"
+    android:layout_margin="@dimen/expense_margin">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_expense_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            tools:text="Ciao"/>
+        <TextView
+            android:id="@+id/tv_expense_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            tools:text="25/03/2019"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_expense_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        tools:text="US$ 10.00" />
+</LinearLayout>
