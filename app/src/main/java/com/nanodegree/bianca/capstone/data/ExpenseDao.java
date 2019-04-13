@@ -31,11 +31,5 @@ public interface ExpenseDao {
     List<Expense> getSinceLastExpire(long lastExpireDate);
 
     @Insert
-    void insertAll(Expense... expenses);
-
-    @Insert
     void insert(Expense expense);
-
-    @Delete
-    void delete(Expense expense);
 }

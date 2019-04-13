@@ -1,5 +1,6 @@
 package com.nanodegree.bianca.capstone;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -74,7 +75,6 @@ public class AddExpense extends AppCompatActivity {
         }
     }
 
-
     private class AddExpenseAsyncTask extends AsyncTask<Void, Void, Void> {
         private ExpenseDao mAsyncTaskDao;
         private Expense mExpense;
@@ -93,6 +93,7 @@ public class AddExpense extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            setResult(RESULT_OK);
             finish();
             Toast.makeText(getApplicationContext(), R.string.add_expense_success,
                     Toast.LENGTH_SHORT).show();

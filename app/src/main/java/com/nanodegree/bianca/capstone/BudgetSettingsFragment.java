@@ -11,8 +11,6 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.util.Log;
 
-import com.nanodegree.bianca.capstone.data.BudgetPreferences;
-
 public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
         SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = "BudgetSettingsFragment";
@@ -36,7 +34,7 @@ public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
                     Float.valueOf(stringValue);
                 } catch (NumberFormatException nfe) {
                     Log.d(TAG, "setPreferenceSummary: " + stringValue);
-                    stringValue = String.valueOf(BudgetPreferences.DEFAULT_BUDGET);
+                    stringValue = String.valueOf(MainActivity.DEFAULT_BUDGET);
                 }
             }
             preference.setSummary(stringValue);
