@@ -1,17 +1,22 @@
 package com.nanodegree.bianca.capstone;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -291,7 +296,10 @@ public class MainActivity extends AppCompatActivity
             long date = cursor.getLong(dateColumnIndex);
 
             Expense l = ExpenseLocal.parseExpense(body, date);
-            if (l != null) mDb.expenseDao().insert(l);
+            if (l != null) {
+                mDb.expenseDao().insert(l);
+                checkBudget();
+            }
         }
 
         cursor.close();
@@ -342,6 +350,25 @@ public class MainActivity extends AppCompatActivity
     private void startAddExpenseActivity() {
         Intent intent = new Intent(getApplicationContext(), AddExpense.class);
         startActivity(intent);
+    }
+
+    private void checkBudget() {
+        Intent intent = new Intent(this, MainActivity.class);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle(getString(R.string.notification_message))
+                .setContentText("Your budget is tight!")
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
     /* DB */
