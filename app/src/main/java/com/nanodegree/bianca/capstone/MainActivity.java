@@ -156,6 +156,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_add_expense:
                 startAddExpenseActivity();
                 break;
+            case R.id.action_backup:
+                startBackupActivity();
+                break;
             default:
                 break;
         }
@@ -352,6 +355,11 @@ public class MainActivity extends AppCompatActivity
     private void startAddExpenseActivity() {
         Intent intent = new Intent(getApplicationContext(), AddExpense.class);
         startActivityForResult(intent, ADD_EXPENSE_RESULT);
+    }
+
+    private void startBackupActivity() {
+        Intent intent = new Intent(getApplicationContext(), BackupActivity.class);
+        startActivity(intent);
     }
 
     @Override
