@@ -41,19 +41,11 @@ public class ExpensesDetails extends AppCompatActivity {
         Intent intent = getIntent();
         expire = intent.getLongExtra("exp", 0);
 
-//        myDataset = new ArrayList<>();
-//        myDataset.add(new ExpenseLocal("mercado", 10f, new Date()));
-//        myDataset.add(new ExpenseLocal("luz", 12f, new Date()));
-//        myDataset.add(new ExpenseLocal("telefone", 15f, new Date()));
         recyclerView = findViewById(R.id.rv_expenses_list);
         recyclerView.setHasFixedSize(true);
 
         mDb = ExpenseRoomDatabase.getDatabase(this);
         new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
-
-
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "bill-sms-db").build();
 
         FloatingActionButton fab = findViewById(R.id.fab_add_expense);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -90,9 +82,7 @@ public class ExpensesDetails extends AppCompatActivity {
 
         @Override
         protected List<Expense> doInBackground(Void... voids) {
-//            List<Expense> expenses = (List<Expense>) mAsyncTaskDao.getAllB();
-            List<Expense> expenses =
-                    (List<Expense>) mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
+            List<Expense> expenses = mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
 
             return expenses;
         }

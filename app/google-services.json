@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "464051360657",
+    "firebase_url": "https://billsms.firebaseio.com",
+    "project_id": "billsms",
+    "storage_bucket": "billsms.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464051360657:android:617801b133a76ee2",
+        "android_client_info": {
+          "package_name": "com.nanodegree.bianca.capstone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464051360657-251lh6183i6ld8i782ldvmhsksq3tgqu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBao_8dKCGvlXxGrZEzi9hZWBO3UVx8RC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464051360657-251lh6183i6ld8i782ldvmhsksq3tgqu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

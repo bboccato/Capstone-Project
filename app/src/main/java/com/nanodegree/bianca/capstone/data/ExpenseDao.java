@@ -11,18 +11,7 @@ import java.util.List;
 @Dao
 public interface ExpenseDao {
     @Query("SELECT * FROM expense_table ORDER BY value ASC")
-    LiveData<List<Expense>> getAll();
-
-
-    @Query("SELECT * FROM expense_table ORDER BY value ASC")
-    List<Expense> getAllB();
-
-    @Query("SELECT * FROM expense_table WHERE uid IN (:expenseIds)")
-    List<Expense> loadAllByIds(int[] expenseIds);
-
-    @Query("SELECT * FROM expense_table WHERE summary LIKE :summary AND " +
-            "value LIKE :value LIMIT 1")
-    Expense findBySummary(String summary, String value);
+    List<Expense> getAll();
 
     @Query("SELECT * FROM expense_table ORDER BY date DESC LIMIT 1")
     Expense getLatest();
