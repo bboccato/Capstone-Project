@@ -37,12 +37,9 @@ public class AddExpense extends AppCompatActivity {
         mValue = findViewById(R.id.et_total_value);
 
 
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mIsSave = true;
-                addExpense();
-            }
+        mSaveButton.setOnClickListener(v -> {
+            mIsSave = true;
+            addExpense();
         });
     }
 
@@ -95,7 +92,6 @@ public class AddExpense extends AppCompatActivity {
             finish();
             Toast.makeText(getApplicationContext(), R.string.add_expense_success,
                     Toast.LENGTH_SHORT).show();
-
         }
     }
 }

@@ -56,15 +56,11 @@ public class MainActivity extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
     private static final int ADD_EXPENSE_RESULT = 2;
 
-    private PublisherAdView mPublisherAdView;
-    private AnimatedPieView mAnimatedPieView;
     private TextView mDaysLeftView;
     private TextView mRemainingLegendView;
     private TextView mExpensesLegendView;
-    private TextView mDebug;
     private float mTotalExpenses;
     private float mTotalBudget;
-    private static volatile ExpenseRoomDatabase INSTANCE;
     private ExpenseRoomDatabase mDb;
     private ExpenseDao mDao;
     private Expense mLatestExpense;
@@ -78,20 +74,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         mDaysLeftView = findViewById(R.id.tv_days_left);
         mRemainingLegendView = findViewById(R.id.tv_legend_remaining);
-        mRemainingLegendView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startBudgetSettingActivity();
-            }
-        });
+        mRemainingLegendView.setOnClickListener(v -> startBudgetSettingActivity());
         mExpensesLegendView = findViewById(R.id.tv_legend_expenses);
-        mExpensesLegendView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startExpenseDetailsActivity();
-            }
-        });
-        mDebug = findViewById(R.id.debug);
+        mExpensesLegendView.setOnClickListener(v -> startExpenseDetailsActivity());
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setupAdBanner();
         setupSharedPreferences();
@@ -109,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         Log.d(TAG, "onResume: ");
         super.onResume();
-        new FetchLatestExpenseInDbAsyncTask(this, mDao).execute();
+        new FetchLatestExpenseInDbAsyncTask(mDao).execute();
         new FetchTotalExpensesAsyncTask(mDao, mLastExpireDate).execute();
     }
 
@@ -169,26 +154,23 @@ public class MainActivity extends AppCompatActivity
     private void setupPieChart() {
         Log.d(TAG, "setupPieChart: ");
         // https://github.com/razerdp/AnimatedPieView/blob/master/README_EN.md
-        mAnimatedPieView = findViewById(R.id.animatedPieView);
+        AnimatedPieView mAnimatedPieView = findViewById(R.id.animatedPieView);
         AnimatedPieViewConfig config = new AnimatedPieViewConfig();
         config.startAngle(-90)
                 .strokeWidth(100)
                 .drawText(true)
                 .textSize(30)
-                .selectListener(new OnPieSelectListener() {
-                    @Override
-                    public void onSelectPie(@NonNull IPieInfo pieInfo, boolean isFloatUp) {
-                        Log.d(TAG, "onSelectPie: ");
-                        switch (pieInfo.getDesc()) {
-                            case EXPENSES:
-                                startExpenseDetailsActivity();
-                                break;
-                            case REMAINING:
-                                startBudgetSettingActivity();
-                                break;
-                            default:
-                                break;
-                        }
+                .selectListener((OnPieSelectListener) (pieInfo, isFloatUp) -> {
+                    Log.d(TAG, "onSelectPie: ");
+                    switch (pieInfo.getDesc()) {
+                        case EXPENSES:
+                            startExpenseDetailsActivity();
+                            break;
+                        case REMAINING:
+                            startBudgetSettingActivity();
+                            break;
+                        default:
+                            break;
                     }
                 })
                 .addData(new SimplePieInfo(getTotalExpenses(), Color.RED, EXPENSES), false)
@@ -231,7 +213,7 @@ public class MainActivity extends AppCompatActivity
     /* ADD BANNER */
     private void setupAdBanner() {
         Log.d(TAG, "setupAdBanner: ");
-        mPublisherAdView = findViewById(R.id.publisherAdView);
+        PublisherAdView mPublisherAdView = findViewById(R.id.publisherAdView);
         PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
         mPublisherAdView.loadAd(adRequest);
     }
@@ -264,7 +246,6 @@ public class MainActivity extends AppCompatActivity
                     // Permission denied, boo!
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT);
                 }
-                return;
             }
         }
     }
@@ -300,7 +281,7 @@ public class MainActivity extends AppCompatActivity
             String body = cursor.getString(bodyColumnIndex);
             long date = cursor.getLong(dateColumnIndex);
 
-            Expense l = ExpenseLocal.parseExpense(body, date);
+            Expense l = Util.parseExpense(body, date);
             if (l != null) {
                 mDb.expenseDao().insert(l);
                 checkBudget();
@@ -392,19 +373,14 @@ public class MainActivity extends AppCompatActivity
 
     /* DB */
     private class FetchLatestExpenseInDbAsyncTask extends AsyncTask<Expense, Void, Expense> {
-
         private ExpenseDao mAsyncTaskDao;
-        private Context mContext;
-
-        FetchLatestExpenseInDbAsyncTask(Context context, ExpenseDao dao) {
-            mContext = context;
+        FetchLatestExpenseInDbAsyncTask(ExpenseDao dao) {
             mAsyncTaskDao = dao;
         }
 
         @Override
         protected Expense doInBackground(final Expense... params) {
-            Expense latest = mAsyncTaskDao.getLatest();
-            return latest;
+            return mAsyncTaskDao.getLatest();
         }
 
         @Override

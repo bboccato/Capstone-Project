@@ -21,10 +21,6 @@ public class ExpensesDetails extends AppCompatActivity {
     private static final String TAG = "ExpensesDetails";
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
-
-//    private List<ExpenseLocal> myDataset;
-
     private List<Expense> mExpenses;
     private ExpenseRoomDatabase mDb;
     private long expire;

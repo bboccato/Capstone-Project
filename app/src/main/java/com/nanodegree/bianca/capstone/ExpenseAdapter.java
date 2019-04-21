@@ -1,5 +1,6 @@
 package com.nanodegree.bianca.capstone;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,10 +17,10 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
     private List<Expense> mDataSet;
 
     public static class ExpenseViewHolder extends RecyclerView.ViewHolder {
-        public TextView summary;
+        TextView summary;
         public TextView value;
         public TextView date;
-        public ExpenseViewHolder(@NonNull View view) {
+        ExpenseViewHolder(@NonNull View view) {
             super(view);
             summary = view.findViewById(R.id.tv_expense_summary);
             value = view.findViewById(R.id.tv_expense_value);
@@ -27,7 +28,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
         }
     }
 
-    public ExpenseAdapter(List<Expense> dataSet) {
+    ExpenseAdapter(List<Expense> dataSet) {
         mDataSet = dataSet;
     }
 
@@ -41,6 +42,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
         return vh;
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull ExpenseAdapter.ExpenseViewHolder expenseViewHolder,
                                  int position) {
@@ -50,7 +52,7 @@ class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHold
 
         expenseViewHolder.value.setText(String.format("US$ %.2f", expense.value));
 
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
         String dateString = format.format(expense.date);
         expenseViewHolder.date.setText(dateString);
     }

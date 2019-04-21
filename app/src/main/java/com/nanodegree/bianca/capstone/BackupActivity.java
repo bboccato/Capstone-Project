@@ -27,7 +27,6 @@ public class BackupActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
 
     Button mBackupButton;
-    private ExpenseRoomDatabase mDb;
     FirebaseUser mFirebaseUser;
 
 
@@ -74,7 +73,7 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void setupFirebase() {
-        mDb = ExpenseRoomDatabase.getDatabase(this);
+        ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(this);
         new CurrentExpensesAsyncTask(mDb.expenseDao()).execute();
     }
 
