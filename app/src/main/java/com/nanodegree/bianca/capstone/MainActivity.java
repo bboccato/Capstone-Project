@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +37,6 @@ import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
 import com.razerdp.widget.animatedpieview.AnimatedPieViewConfig;
 import com.razerdp.widget.animatedpieview.callback.OnPieSelectListener;
-import com.razerdp.widget.animatedpieview.data.IPieInfo;
 import com.razerdp.widget.animatedpieview.data.SimplePieInfo;
 
 import java.util.Calendar;
@@ -325,22 +323,26 @@ public class MainActivity extends AppCompatActivity
     private void startBudgetSettingActivity() {
         Intent intent = new Intent(getApplicationContext(), BudgetSettings.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.horizontal_animation, 0);
     }
 
     private void startExpenseDetailsActivity() {
         Intent intent = new Intent(getApplicationContext(), ExpensesDetails.class);
         intent.putExtra("exp", mLastExpireDate);
         startActivity(intent);
+        overridePendingTransition(R.anim.horizontal_animation, 0);
     }
 
     private void startAddExpenseActivity() {
         Intent intent = new Intent(getApplicationContext(), AddExpense.class);
         startActivityForResult(intent, ADD_EXPENSE_RESULT);
+        overridePendingTransition(R.anim.horizontal_animation, 0);
     }
 
     private void startBackupActivity() {
         Intent intent = new Intent(getApplicationContext(), BackupActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.horizontal_animation, 0);
     }
 
     @Override
