@@ -9,9 +9,7 @@ import android.widget.TextView;
 
 import com.nanodegree.bianca.capstone.data.Expense;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {

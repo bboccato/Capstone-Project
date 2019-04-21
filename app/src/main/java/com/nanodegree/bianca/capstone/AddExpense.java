@@ -1,6 +1,5 @@
 package com.nanodegree.bianca.capstone;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -36,7 +35,6 @@ public class AddExpense extends AppCompatActivity {
         mSaveButton = findViewById(R.id.button);
         mSummary = findViewById(R.id.et_summary_value);
         mValue = findViewById(R.id.et_total_value);
-        Date date;
 
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {

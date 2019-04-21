@@ -1,6 +1,5 @@
 package com.nanodegree.bianca.capstone;
 
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,13 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.nanodegree.bianca.capstone.data.AppDatabase;
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ExpensesDetails extends AppCompatActivity {
