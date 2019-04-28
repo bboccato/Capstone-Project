@@ -25,4 +25,5 @@
     <string name="notification_message">Bill SMS</string>
     <string name="title_activity_backup">Backup expenses</string>
     <string name="backup_expenses">Backup expenses</string>
+    <string name="save">Save</string>
 </resources>

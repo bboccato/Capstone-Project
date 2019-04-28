@@ -1,5 +1,6 @@
 package com.nanodegree.bianca.capstone;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -25,7 +26,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        String date = String.format("%d/%d/%d", month, dayOfMonth, year);
+        @SuppressLint("DefaultLocale") String date = String.format("%02d/%02d/%d", month + 1,
+                dayOfMonth, year);
         Log.d(TAG, "onDateSet: " + date);
         ((Button)getActivity().findViewById(R.id.button_date)).setText(date);
     }
