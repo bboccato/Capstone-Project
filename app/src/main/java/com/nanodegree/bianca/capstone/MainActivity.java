@@ -323,26 +323,26 @@ public class MainActivity extends AppCompatActivity
     private void startBudgetSettingActivity() {
         Intent intent = new Intent(getApplicationContext(), BudgetSettings.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.horizontal_animation, 0);
+        overridePendingTransition(R.anim.vertical_animation, 0);
     }
 
     private void startExpenseDetailsActivity() {
         Intent intent = new Intent(getApplicationContext(), ExpensesDetails.class);
         intent.putExtra("exp", mLastExpireDate);
         startActivity(intent);
-        overridePendingTransition(R.anim.horizontal_animation, 0);
+        overridePendingTransition(R.anim.vertical_animation, 0);
     }
 
     private void startAddExpenseActivity() {
         Intent intent = new Intent(getApplicationContext(), AddExpense.class);
         startActivityForResult(intent, ADD_EXPENSE_RESULT);
-        overridePendingTransition(R.anim.horizontal_animation, 0);
+        overridePendingTransition(R.anim.vertical_animation, 0);
     }
 
     private void startBackupActivity() {
         Intent intent = new Intent(getApplicationContext(), BackupActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.horizontal_animation, 0);
+        overridePendingTransition(R.anim.vertical_animation, 0);
     }
 
     @Override
