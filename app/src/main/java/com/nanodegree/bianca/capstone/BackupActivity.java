@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -26,9 +27,9 @@ public class BackupActivity extends AppCompatActivity {
     private static final String EXPENSES_COLLECTION = "BackupActivity";
     private static final int RC_SIGN_IN = 1;
 
-    Button mBackupButton;
-    FirebaseUser mFirebaseUser;
-
+    private Button mBackupButton;
+    private FirebaseUser mFirebaseUser;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class BackupActivity extends AppCompatActivity {
 
         mBackupButton = findViewById(R.id.backup_button);
         mBackupButton.setOnClickListener(v -> signInFirebase());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -103,6 +105,9 @@ public class BackupActivity extends AppCompatActivity {
             for (Expense expense : expenses) {
                 userExpenses.add(expense);
             }
+            Bundle bundle = new Bundle();
+            bundle.putString("UID", mFirebaseUser.getUid());
+            mFirebaseAnalytics.logEvent("BACKUP", bundle);
         }
     }
 }
