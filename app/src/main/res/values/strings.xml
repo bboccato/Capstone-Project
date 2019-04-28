@@ -23,6 +23,6 @@
     <string name="menu_backup">Backup expenses</string>
     <string name="permission_denied">"If we cannot read your SMSs we cannot keep track on your expenses"</string>
     <string name="notification_message">Bill SMS</string>
-    <string name="title_activity_backup">Backup expenses to Drive</string>
+    <string name="title_activity_backup">Backup expenses</string>
     <string name="backup_expenses">Backup expenses</string>
 </resources>
