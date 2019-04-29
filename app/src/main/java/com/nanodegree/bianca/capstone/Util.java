@@ -11,8 +11,10 @@ public class Util {
     }
 
     public static Expense parseExpense(String message, long indate) {
-        String regex =
-                ".*\\*(.*) \\$(\\d+\\.\\d\\d).*";
+        /* Expected SMS is formatted as
+        * Compra aprovada no seu PERSON VS PLATINUM final 7701 - PAG*SMS-21* valor US$21.00 em 07/03, as 19h16 .
+        * */
+        String regex = ".*\\*(.*)\\*.*\\$(\\d+\\.\\d+).*";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(message);
         if (matcher.find()) {
