@@ -11,8 +11,7 @@ public class Util {
     }
 
     public static Expense parseExpense(String message, long indate) {
-        String regex =
-                ".*\\*(.*) \\$(\\d+\\.\\d\\d).*";
+        String regex = ".*\\*(.*)\\*.*\\$(\\d+\\.\\d+).*";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(message);
         if (matcher.find()) {
