@@ -80,8 +80,7 @@ public class BudgetSettingsFragment extends PreferenceFragmentCompat implements
             if (!(preference instanceof SwitchPreference)) {
                 String value = sharedPreferences.getString(preference.getKey(), "");
                 setPreferenceSummary(preference, sharedPreferences.getString(key, value));
-                sharedPreferences.edit().putString(key, value);
-                sharedPreferences.edit().commit();
+                sharedPreferences.edit().putString(key, value).apply();
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.nanodegree.bianca.capstone;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.fragment.app.DialogFragment;
@@ -92,7 +93,7 @@ public class AddExpense extends AppCompatActivity {
     private void addExpense() {
         String dateString = mDate.getText().toString();
         long dateLong;
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
         try {
             dateLong = format.parse(dateString).getTime();
         } catch (ParseException e) {

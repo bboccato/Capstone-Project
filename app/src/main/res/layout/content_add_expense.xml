@@ -30,7 +30,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/tv_summary_label"
         app:layout_constraintTop_toTopOf="@id/tv_summary_label"
-        app:layout_constraintBottom_toBottomOf="@id/tv_summary_label"/>
+        app:layout_constraintBottom_toBottomOf="@id/tv_summary_label"
+        android:hint="@string/expense_summary_hint"/>
 
     <TextView
         android:id="@+id/tv_total_label"
@@ -47,7 +48,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/tv_total_label"
         app:layout_constraintTop_toTopOf="@id/tv_total_label"
-        app:layout_constraintBottom_toBottomOf="@id/tv_total_label"/>
+        app:layout_constraintBottom_toBottomOf="@id/tv_total_label"
+        android:hint="@string/total_value_hint"/>
 
 
     <TextView

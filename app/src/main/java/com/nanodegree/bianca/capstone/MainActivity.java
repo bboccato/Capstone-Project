@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity
                 setTotalBudget(Float.valueOf(sharedPreferences.getString(key,
                         String.valueOf(DEFAULT_BUDGET))));
             } catch (NumberFormatException nfe) {
-                sharedPreferences.edit().putString(key, String.valueOf(DEFAULT_BUDGET));
+                sharedPreferences.edit().putString(key, String.valueOf(DEFAULT_BUDGET)).apply();
                 setTotalBudget(DEFAULT_BUDGET);
             }
         }
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity
                     new InsertExpenseFromSmsAsyncTask().execute();
                 } else {
                     // Permission denied, boo!
-                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT);
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
                 }
             }
         }

@@ -12,6 +12,7 @@
         android:layout_gravity="center"
         android:src="@android:drawable/ic_input_add"
         android:background="@color/colorAccent"
+        android:contentDescription="@string/add_expense_widget_desc"
         />
     <TextView
         android:id="@+id/widget_expenses"

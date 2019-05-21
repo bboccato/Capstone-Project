@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'CapstoneKey'
-            keyPassword 'capstoneKeyPassword'
-            storeFile file('/Users/biancab/keystores/upload-keystore.jks')
-            storePassword 'capstoneStorePassword'
+            keyAlias 'capstone'
+            keyPassword 'BB.ndrd.401'
+            storeFile file('../upload-keystore.jks')
+            storePassword 'BB.ndrd.401'
         }
     }
     compileSdkVersion 28

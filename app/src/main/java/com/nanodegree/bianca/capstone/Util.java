@@ -1,11 +1,14 @@
 package com.nanodegree.bianca.capstone;
 
+import android.annotation.SuppressLint;
+
 import com.nanodegree.bianca.capstone.data.Expense;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
+    @SuppressLint("DefaultLocale")
     public static String formatSummary(String label, float value) {
         return String.format("%s US$ %.2f", label, value);
     }

@@ -27,4 +27,6 @@
     <string name="backup_expenses">Backup expenses</string>
     <string name="save">Save</string>
     <string name="add_expense_widget_desc">Add expense</string>
+    <string name="expense_summary_hint">Expense summary</string>
+    <string name="total_value_hint">25.00</string>
 </resources>
