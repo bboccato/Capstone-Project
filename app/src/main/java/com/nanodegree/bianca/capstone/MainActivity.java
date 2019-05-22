@@ -393,7 +393,6 @@ public class MainActivity extends AppCompatActivity
 
     /* DB */
     private class InsertExpenseFromSmsAsyncTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(TAG, "InsertExpenseTask doInBackground: ");
