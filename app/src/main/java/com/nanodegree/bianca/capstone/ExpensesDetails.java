@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
+import com.nanodegree.bianca.capstone.data.ExpenseViewModel;
 
 import java.util.List;
 
@@ -23,9 +27,9 @@ public class ExpensesDetails extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private List<Expense> mExpenses;
-    private ExpenseRoomDatabase mDb;
     private long expire;
     private Parcelable mListState;
+    private ExpenseViewModel mExpenseViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +43,19 @@ public class ExpensesDetails extends AppCompatActivity {
         recyclerView = findViewById(R.id.rv_expenses_list);
         recyclerView.setHasFixedSize(true);
 
-        mDb = ExpenseRoomDatabase.getDatabase(this);
-        new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
+        mExpenseViewModel = ViewModelProviders.of(this).get(ExpenseViewModel.class);
+        mExpenseViewModel.getSinceLastExpire(expire).observe(this, new Observer<List<Expense>>() {
+            @Override
+            public void onChanged(List<Expense> expenses) {
+                setExpenses(expenses);
+                mAdapter = new ExpenseAdapter(mExpenses);
+                recyclerView.setAdapter(mAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                if (mListState != null) {
+                    recyclerView.getLayoutManager().onRestoreInstanceState(mListState);
+                }
+            }
+        });
 
         FloatingActionButton fab = findViewById(R.id.fab_add_expense);
         fab.setOnClickListener(view -> {
@@ -48,12 +63,6 @@ public class ExpensesDetails extends AppCompatActivity {
             startActivity(intent1);
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        new CurrentExpensesAsyncTask(this, mDb.expenseDao(), expire).execute();
     }
 
     @Override
@@ -74,36 +83,5 @@ public class ExpensesDetails extends AppCompatActivity {
 
     public void setExpenses(List<Expense> expenses) {
         mExpenses = expenses;
-    }
-
-    private class CurrentExpensesAsyncTask extends AsyncTask<Void, Void, List<Expense>> {
-
-        private Context mContext;
-        private ExpenseDao mAsyncTaskDao;
-        private long mLastExpireDate;
-
-        CurrentExpensesAsyncTask(Context context, ExpenseDao dao, long lastExpireDate) {
-            mContext = context;
-            mAsyncTaskDao = dao;
-            mLastExpireDate = lastExpireDate;
-        }
-
-        @Override
-        protected List<Expense> doInBackground(Void... voids) {
-            List<Expense> expenses = mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
-
-            return expenses;
-        }
-
-        @Override
-        protected void onPostExecute(List<Expense> expenses) {
-            setExpenses(expenses);
-            mAdapter = new ExpenseAdapter(mExpenses);
-            recyclerView.setAdapter(mAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-            if (mListState != null) {
-                recyclerView.getLayoutManager().onRestoreInstanceState(mListState);
-            }
-        }
     }
 }

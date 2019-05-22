@@ -5,6 +5,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
@@ -17,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
+import com.nanodegree.bianca.capstone.data.ExpenseViewModel;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +35,8 @@ public class BackupActivity extends AppCompatActivity {
     private Button mBackupButton;
     private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private ExpenseViewModel mExpenseViewModel;
+    private List<Expense> mExpenses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,14 @@ public class BackupActivity extends AppCompatActivity {
         mBackupButton = findViewById(R.id.backup_button);
         mBackupButton.setOnClickListener(v -> signInFirebase());
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mExpenseViewModel = ViewModelProviders.of(this).get(ExpenseViewModel.class);
+        mExpenseViewModel.getAllExpenses().observe(this, new Observer<List<Expense>>() {
+            @Override
+            public void onChanged(List<Expense> expenses) {
+                mExpenses = expenses;
+            }
+        });
     }
 
     @Override
@@ -75,39 +90,17 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void setupFirebase() {
-        ExpenseRoomDatabase mDb = ExpenseRoomDatabase.getDatabase(this);
-        new CurrentExpensesAsyncTask(mDb.expenseDao()).execute();
-    }
-
-
-    private class CurrentExpensesAsyncTask extends AsyncTask<Void, Void, List<Expense>> {
-        private ExpenseDao mAsyncTaskDao;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-        CurrentExpensesAsyncTask(ExpenseDao dao) {
-            mAsyncTaskDao = dao;
+        if (mFirebaseUser == null) return;
+        CollectionReference allBills = db.collection(BILL_SMS_COLLECTION);
+        DocumentReference userDb = allBills.document(mFirebaseUser.getUid());
+        CollectionReference userExpenses = userDb.collection(EXPENSES_COLLECTION);
+        for (Expense expense : mExpenses) {
+            userExpenses.add(expense);
         }
+        Bundle bundle = new Bundle();
+        bundle.putString("UID", mFirebaseUser.getUid());
+        mFirebaseAnalytics.logEvent("BACKUP", bundle);
 
-        @Override
-        protected List<Expense> doInBackground(Void... voids) {
-            List<Expense> expenses = mAsyncTaskDao.getAll();
-
-            return expenses;
-        }
-
-        @Override
-        protected void onPostExecute(List<Expense> expenses) {
-            if (mFirebaseUser == null) return;
-            CollectionReference allBills = db.collection(BILL_SMS_COLLECTION);
-            DocumentReference userDb = allBills.document(mFirebaseUser.getUid());
-            CollectionReference userExpenses = userDb.collection(EXPENSES_COLLECTION);
-            for (Expense expense : expenses) {
-                userExpenses.add(expense);
-            }
-            Bundle bundle = new Bundle();
-            bundle.putString("UID", mFirebaseUser.getUid());
-            mFirebaseAnalytics.logEvent("BACKUP", bundle);
-        }
     }
 }

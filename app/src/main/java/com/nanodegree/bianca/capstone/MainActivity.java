@@ -20,6 +20,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
@@ -34,6 +37,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.nanodegree.bianca.capstone.data.Expense;
 import com.nanodegree.bianca.capstone.data.ExpenseDao;
 import com.nanodegree.bianca.capstone.data.ExpenseRoomDatabase;
+import com.nanodegree.bianca.capstone.data.ExpenseViewModel;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
 import com.razerdp.widget.animatedpieview.AnimatedPieViewConfig;
 import com.razerdp.widget.animatedpieview.callback.OnPieSelectListener;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     private Expense mLatestExpense;
     private long mLastExpireDate;
     private SharedPreferences mSharedPreferences;
+    private ExpenseViewModel mExpenseViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,15 +90,28 @@ public class MainActivity extends AppCompatActivity
 
         mTotalBudget =
                 Float.valueOf(mSharedPreferences.getString(getResources().getString(R.string.key_budget),
-                String.valueOf(DEFAULT_BUDGET)));
-    }
+                        String.valueOf(DEFAULT_BUDGET)));
 
-    @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume: ");
-        super.onResume();
-        new FetchLatestExpenseInDbAsyncTask(mDao).execute();
-        new FetchTotalExpensesAsyncTask(mDao, mLastExpireDate).execute();
+        mExpenseViewModel = ViewModelProviders.of(this).get(ExpenseViewModel.class);
+        mExpenseViewModel.getLatest().observe(this, new Observer<Expense>() {
+            @Override
+            public void onChanged(Expense expense) {
+                setLatestExpense(expense);
+                requestSmsReadPermission();
+            }
+        });
+
+        mExpenseViewModel.getSinceLastExpire(mLastExpireDate).observe(this, new Observer<List<Expense>>() {
+            @Override
+            public void onChanged(List<Expense> expenses) {
+                float total = 0f;
+                for (Expense e : expenses) {
+                    total += e.value;
+                }
+                setTotalExpenses(total);
+                setupPieChart();
+            }
+        });
     }
 
     /* SHARED PREFERENCES */
@@ -374,24 +392,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /* DB */
-    private class FetchLatestExpenseInDbAsyncTask extends AsyncTask<Expense, Void, Expense> {
-        private ExpenseDao mAsyncTaskDao;
-        FetchLatestExpenseInDbAsyncTask(ExpenseDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Expense doInBackground(final Expense... params) {
-            return mAsyncTaskDao.getLatest();
-        }
-
-        @Override
-        protected void onPostExecute(Expense expense) {
-            setLatestExpense(expense);
-            requestSmsReadPermission();
-        }
-    }
-
     private class InsertExpenseFromSmsAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -399,33 +399,6 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "InsertExpenseTask doInBackground: ");
             fetchSmsLog();
             return null;
-        }
-    }
-
-    private class FetchTotalExpensesAsyncTask extends AsyncTask<Void, Void, Float> {
-
-        private ExpenseDao mAsyncTaskDao;
-        private long mLastExpireDate;
-
-        FetchTotalExpensesAsyncTask(ExpenseDao dao, long lastExpireDate) {
-            mAsyncTaskDao = dao;
-            mLastExpireDate = lastExpireDate;
-        }
-
-        @Override
-        protected Float doInBackground(Void... voids) {
-            List<Expense> expenses = mAsyncTaskDao.getSinceLastExpire(mLastExpireDate);
-            float total = 0f;
-            for (Expense e : expenses) {
-                total += e.value;
-            }
-            return total;
-        }
-
-        @Override
-        protected void onPostExecute(Float total) {
-            setTotalExpenses(total);
-            setupPieChart();
         }
     }
 }
