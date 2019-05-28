@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:focusable="true"
@@ -15,9 +16,9 @@
         android:contentDescription="@string/add_expense_widget_desc"
         />
     <TextView
-        android:id="@+id/widget_expenses"
+        android:id="@+id/widget_expenses_summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="100 dol"/>
+        tools:text="100 dol"/>
 </LinearLayout>

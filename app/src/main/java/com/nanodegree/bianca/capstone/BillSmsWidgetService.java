@@ -9,14 +9,14 @@ public class BillSmsWidgetService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new BillSmsRemoteViewsFactory(this.getApplicationContext());
+        return new BillSmsRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 }
 
 class BillSmsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-    Context mContext;
+    private Context mContext;
 
-    public BillSmsRemoteViewsFactory(Context context) {
+    public BillSmsRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
     }
 
