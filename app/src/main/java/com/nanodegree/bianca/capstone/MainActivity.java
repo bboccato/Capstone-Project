@@ -3,6 +3,8 @@ package com.nanodegree.bianca.capstone;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -136,6 +138,9 @@ public class MainActivity extends AppCompatActivity
         }
         if (key.equals(getString(R.string.key_expire))) {
             updateLegends(sharedPreferences);
+        }
+        if (key.equals(getString(R.string.key_current_expenses))) {
+            //TODO update widget
         }
         setupPieChart();
         updateLegends(mSharedPreferences);
@@ -319,6 +324,10 @@ public class MainActivity extends AppCompatActivity
     public void setTotalExpenses(float totalExpenses) {
         Log.d(TAG, "setTotalExpenses: " + totalExpenses);
         mTotalExpenses = totalExpenses;
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putFloat(getString(R.string.key_current_expenses), mTotalExpenses);
+        editor.commit();
+        updateWidgets();
         updateLegends(mSharedPreferences);
         setupPieChart();
     }
@@ -389,6 +398,15 @@ public class MainActivity extends AppCompatActivity
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    private void updateWidgets() {
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(this, BillSmsWidgetProvider.class));
+        Intent updateIntent = new Intent();
+        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        updateIntent.putExtra(BillSmsWidgetProvider.BILL_SMS_WIDGET_IDS_KEY, ids);
+        this.sendBroadcast(updateIntent);
     }
 
     /* DB */

@@ -77,8 +77,6 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/add_exp_widget_info" />
         </receiver>
-        <service android:name=".BillSmsWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

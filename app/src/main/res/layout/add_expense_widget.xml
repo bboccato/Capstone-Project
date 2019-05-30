@@ -20,5 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginStart="@dimen/expense_margin"
+        android:fontFamily="sans-serif-condensed-medium"
         tools:text="100 dol"/>
 </LinearLayout>
