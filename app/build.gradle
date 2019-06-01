@@ -4,7 +4,7 @@ android {
     signingConfigs {
         config {
             keyAlias 'capstone'
-            keyPassword 'BB.ndrd.401'
+            keyPassword 'BB.cpstn.403'
             storeFile file('../upload-keystore.jks')
             storePassword 'BB.ndrd.401'
         }
